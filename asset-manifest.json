@@ -1,23 +1,19 @@
 {
   "files": {
     "main.css": "/admin-dashboard/static/css/main.f1a7b5bb.css",
-    "main.js": "/admin-dashboard/static/js/main.6dad2867.js",
-    "static/js/849.36942e8b.chunk.js": "/admin-dashboard/static/js/849.36942e8b.chunk.js",
-    "static/css/880.9b686faf.chunk.css": "/admin-dashboard/static/css/880.9b686faf.chunk.css",
-    "static/js/880.ebcbca1d.chunk.js": "/admin-dashboard/static/js/880.ebcbca1d.chunk.js",
+    "main.js": "/admin-dashboard/static/js/main.fb1c1727.js",
+    "static/js/176.fe52c222.chunk.js": "/admin-dashboard/static/js/176.fe52c222.chunk.js",
+    "static/css/224.6517cd64.chunk.css": "/admin-dashboard/static/css/224.6517cd64.chunk.css",
+    "static/js/224.0a061e7b.chunk.js": "/admin-dashboard/static/js/224.0a061e7b.chunk.js",
     "static/js/206.6b2b7aea.chunk.js": "/admin-dashboard/static/js/206.6b2b7aea.chunk.js",
-    "static/js/367.9c957b26.chunk.js": "/admin-dashboard/static/js/367.9c957b26.chunk.js",
-    "static/js/852.bdcf4ea0.chunk.js": "/admin-dashboard/static/js/852.bdcf4ea0.chunk.js",
-    "static/js/620.e9c73777.chunk.js": "/admin-dashboard/static/js/620.e9c73777.chunk.js",
+    "static/js/867.3cb40b34.chunk.js": "/admin-dashboard/static/js/867.3cb40b34.chunk.js",
+    "static/js/883.3dd49956.chunk.js": "/admin-dashboard/static/js/883.3dd49956.chunk.js",
+    "static/js/470.c789f695.chunk.js": "/admin-dashboard/static/js/470.c789f695.chunk.js",
     "static/media/logo.png": "/admin-dashboard/static/media/logo.cf59bf8e0c543aee3c49.png",
-    "static/media/slick.svg": "/admin-dashboard/static/media/slick.2630a3e3eab21c607e21.svg",
-    "static/media/slick.eot": "/admin-dashboard/static/media/slick.a4e97f5a2a64f0ab1323.eot",
-    "static/media/slick.ttf": "/admin-dashboard/static/media/slick.c94f7671dcc99dce43e2.ttf",
-    "static/media/slick.woff": "/admin-dashboard/static/media/slick.295183786cd8a1389865.woff",
     "index.html": "/admin-dashboard/index.html"
   },
   "entrypoints": [
     "static/css/main.f1a7b5bb.css",
-    "static/js/main.6dad2867.js"
+    "static/js/main.fb1c1727.js"
   ]
 }
