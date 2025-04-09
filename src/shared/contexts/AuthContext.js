@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axiosInstance from '../api/axiosConfig';
+import browserHistory from '../utils/browserHistory';
 
 const AuthContext = createContext();
 
@@ -123,6 +124,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('username');
       localStorage.removeItem('role');
       setCurrentUser(null);
+      
+      // Rediriger vers la page de connexion avec window.location pour forcer un rechargement complet
       window.location.href = '/admin/login';
     }
   };

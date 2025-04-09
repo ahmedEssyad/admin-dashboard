@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ToastContainer } from 'react-toastify';
@@ -21,6 +21,7 @@ const ClientRoutes = lazy(() => import('./client/routes/ClientRoutes'));
 
 function App() {
   // Déterminer si nous sommes sur l'interface admin ou client
+  // Utiliser pathname au lieu de hash pour BrowserRouter
   const isAdminRoute = window.location.pathname.startsWith('/admin');
   const currentTheme = isAdminRoute ? adminTheme : clientTheme;
 

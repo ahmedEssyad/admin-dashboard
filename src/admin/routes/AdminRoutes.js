@@ -11,6 +11,7 @@ import Categories from '../pages/Categories';
 import Subcategories from '../pages/Subcategories';
 import Companies from '../pages/Companies';
 import Products from '../pages/Products';
+import ProductEdit from '../pages/products/ProductEdit';
 import Orders from '../pages/Orders';
 import Promotions from '../pages/Promotions';
 import Statistics from '../pages/Statistics';
@@ -81,6 +82,30 @@ function AdminRoutes() {
           <ProtectedRoute requiredPermission={{ resource: 'products', action: 'read' }}>
             <MainLayout>
               <Products />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Ajout/Édition d'un produit */}
+      <Route
+        path="products/edit/:id"
+        element={
+          <ProtectedRoute requiredPermission={{ resource: 'products', action: 'update' }}>
+            <MainLayout>
+              <ProductEdit />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Ajout d'un nouveau produit */}
+      <Route
+        path="products/new"
+        element={
+          <ProtectedRoute requiredPermission={{ resource: 'products', action: 'create' }}>
+            <MainLayout>
+              <ProductEdit />
             </MainLayout>
           </ProtectedRoute>
         }
@@ -162,8 +187,8 @@ function AdminRoutes() {
         }
       />
       
-      <Route path="" element={<Navigate to="/admin/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="" element={<Navigate to="dashboard" replace />} />
+      <Route path="*" element={<Navigate to="dashboard" replace />} />
     </Routes>
   );
 }

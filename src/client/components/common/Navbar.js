@@ -109,7 +109,7 @@ const Navbar = () => {
         position="fixed" 
         initial={false}
         animate={{
-          backgroundColor: isScrolled ? theme.palette.primary.main : '48cae4',
+          backgroundColor: isScrolled ? theme.palette.primary.main : '#48cae4',
           boxShadow: isScrolled ? theme.shadows[4] : 'none'
         }}
         sx={{

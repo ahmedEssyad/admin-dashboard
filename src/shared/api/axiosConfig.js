@@ -1,4 +1,5 @@
 import axios from 'axios';
+import browserHistory from '../utils/browserHistory';
 
 // Use environment variable or fallback to localhost for development
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -33,7 +34,8 @@ axiosInstance.interceptors.response.use(
     // Si erreur 401 (non autorisé), rediriger vers la page de connexion
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/admin/login'; // Correction du chemin
+      // Format pour BrowserRouter
+      window.location.href = '/admin/login';
     }
     return Promise.reject(error);
   }

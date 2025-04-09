@@ -19,6 +19,7 @@ const ProtectedRoute = ({
 
   // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
   if (!currentUser) {
+    // Utilisez le format approprié pour la redirection avec HashRouter
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 

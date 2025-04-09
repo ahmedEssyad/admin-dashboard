@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import axiosInstance from '../../shared/api/axiosConfig';
+import axios from 'axios';
 import ProductCard from '../components/common/ProductCard';
 import CategoryCard from '../components/common/CategoryCard';
 
@@ -24,11 +24,11 @@ const CompanyPage = () => {
         setLoading(true);
         
         // Récupérer les détails de l'entreprise
-        const companyResponse = await axiosInstance.get(`/companies/${id}`);
+        const companyResponse = await axios.get(`/api/companies/${id}`);
         setCompany(companyResponse.data);
         
         // Récupérer les produits de cette entreprise
-        const productsResponse = await axiosInstance.get('/products', { 
+        const productsResponse = await axios.get('/api/products', { 
           params: { companies: id } 
         });
         setProducts(productsResponse.data);

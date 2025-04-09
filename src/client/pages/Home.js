@@ -50,6 +50,8 @@ const preloadHeroImage = (imageUrl) => {
   link.rel = 'preload';
   link.as = 'image';
   link.href = imageUrl;
+  link.type = 'image/webp'; // Ajout du type pour les images webp
+  link.crossOrigin = 'anonymous'; // Ajout pour les images provenant de domaines externes
   
   document.head.appendChild(link);
 };
