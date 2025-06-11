@@ -27,6 +27,7 @@ import NotificationMenu from '../notifications/NotificationMenu';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 import Sidebar from './SideBar';
+import ThemeToggle from '../common/ThemeToggle';
 
 const drawerWidth = 280;
 
@@ -45,7 +46,9 @@ const AppBar = styled(MuiAppBar, {
   }),
   boxShadow: 'none',
   backdropFilter: 'blur(6px)',
-  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  backgroundColor: theme.palette.mode === 'light' 
+    ? 'rgba(255, 255, 255, 0.8)' 
+    : 'rgba(30, 41, 59, 0.8)',
   color: theme.palette.text.primary,
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
@@ -187,6 +190,9 @@ const MainLayout = ({ children }) => {
             Dashboard Admin
           </Typography>
           
+          {/* Bouton de changement de thème */}
+          <ThemeToggle />
+          
           {/* Notifications */}
           <Box sx={{ mr: 1 }}>
             <NotificationMenu />
@@ -244,7 +250,9 @@ const MainLayout = ({ children }) => {
                 '& .MuiPaper-root': {
                   borderRadius: 2,
                   minWidth: 180,
-                  boxShadow: '0px 4px 20px rgba(0,0,0,0.1)',
+                  boxShadow: theme.palette.mode === 'light'
+                    ? '0px 4px 20px rgba(0,0,0,0.1)'
+                    : '0px 4px 20px rgba(0,0,0,0.3)',
                 }
               }}
             >

@@ -15,29 +15,19 @@ import {
   CardContent,
   Alert,
   CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  IconButton
+  ListItemIcon
 } from '@mui/material';
 import {
   Notifications as NotificationIcon,
   ColorLens as ThemeIcon,
   Security as SecurityIcon,
   Language as LanguageIcon,
-  Info as InfoIcon,
-  Warning as WarningIcon,
-  Error as ErrorIcon,
-  CheckCircle as SuccessIcon,
-  Delete as DeleteIcon
+  DarkMode as DarkModeIcon,
+  LightMode as LightModeIcon
 } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { useAuth } from '../../shared/contexts/AuthContext';
-import axiosInstance from '../../shared/api/axiosConfig';
-import notificationService from '../../shared/services/notificationService';
+import { useTheme } from '../../shared/contexts/ThemeContext';
 
 // Composant pour afficher le contenu par onglet
 function TabPanel(props) {
@@ -65,16 +55,11 @@ function Settings() {
   const [userSettings, setUserSettings] = useState({
     notificationsEnabled: true,
     emailNotifications: false,
-    darkMode: false,
     language: 'fr',
     securityAlerts: true,
     twoFactorAuth: false
   });
   const [loading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState([]);
-  const [notificationPage, setNotificationPage] = useState(1);
-  const [totalNotifications, setTotalNotifications] = useState(0);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -84,38 +69,14 @@ function Settings() {
   const [passwordSuccess, setPasswordSuccess] = useState('');
   
   const { currentUser, updateProfile } = useAuth();
-  
-  const ITEMS_PER_PAGE = 10;
+  const { darkMode, toggleTheme } = useTheme();
   
   useEffect(() => {
     // Simuler le chargement des paramètres de l'utilisateur
     setTimeout(() => {
       setLoading(false);
     }, 1000);
-    
-    // Charger les notifications
-    fetchNotifications();
-  }, [notificationPage]);
-  
-  const fetchNotifications = async () => {
-    try {
-      setNotificationsLoading(true);
-      const skip = (notificationPage - 1) * ITEMS_PER_PAGE;
-      
-      const response = await notificationService.getNotifications({
-        limit: ITEMS_PER_PAGE,
-        skip
-      });
-      
-      setNotifications(response.data);
-      setTotalNotifications(response.total);
-    } catch (error) {
-      console.error('Erreur lors du chargement des notifications:', error);
-      toast.error('Erreur lors du chargement des notifications');
-    } finally {
-      setNotificationsLoading(false);
-    }
-  };
+  }, []);
   
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
@@ -181,66 +142,6 @@ function Settings() {
     }
   };
   
-  const markNotificationAsRead = async (notificationId) => {
-    try {
-      await notificationService.markAsRead(notificationId);
-      
-      // Mettre à jour l'état local
-      setNotifications(notifications.map(n => 
-        n._id === notificationId ? { ...n, read: true } : n
-      ));
-      
-      toast.success('Notification marquée comme lue');
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la notification:', error);
-      toast.error('Erreur lors de la mise à jour de la notification');
-    }
-  };
-  
-  const deleteNotification = async (notificationId) => {
-    try {
-      await notificationService.deleteNotification(notificationId);
-      
-      // Mettre à jour l'état local
-      setNotifications(notifications.filter(n => n._id !== notificationId));
-      setTotalNotifications(prev => prev - 1);
-      
-      toast.success('Notification supprimée');
-    } catch (error) {
-      console.error('Erreur lors de la suppression de la notification:', error);
-      toast.error('Erreur lors de la suppression de la notification');
-    }
-  };
-  
-  const markAllAsRead = async () => {
-    try {
-      await notificationService.markAllAsRead();
-      
-      // Mettre à jour l'état local
-      setNotifications(notifications.map(n => ({ ...n, read: true })));
-      
-      toast.success('Toutes les notifications ont été marquées comme lues');
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour des notifications:', error);
-      toast.error('Erreur lors de la mise à jour des notifications');
-    }
-  };
-  
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'info':
-        return <InfoIcon color="info" />;
-      case 'warning':
-        return <WarningIcon color="warning" />;
-      case 'error':
-        return <ErrorIcon color="error" />;
-      case 'success':
-        return <SuccessIcon color="success" />;
-      default:
-        return <InfoIcon color="info" />;
-    }
-  };
-  
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -263,7 +164,6 @@ function Settings() {
           centered
         >
           <Tab label="Profil" />
-          <Tab label="Notifications" />
           <Tab label="Apparence" />
           <Tab label="Sécurité" />
         </Tabs>
@@ -331,150 +231,8 @@ function Settings() {
           </Box>
         </TabPanel>
         
-        {/* Onglet Notifications */}
-        <TabPanel value={value} index={1}>
-          <Box sx={{ p: 2 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom>
-                  Paramètres de notification
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Options de notification
-                    </Typography>
-                    
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={userSettings.notificationsEnabled}
-                          onChange={handleSettingChange}
-                          name="notificationsEnabled"
-                          color="primary"
-                        />
-                      }
-                      label="Activer les notifications"
-                    />
-                    
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={userSettings.emailNotifications}
-                          onChange={handleSettingChange}
-                          name="emailNotifications"
-                          color="primary"
-                          disabled={!userSettings.notificationsEnabled}
-                        />
-                      }
-                      label="Recevoir les notifications par email"
-                    />
-                  </CardContent>
-                </Card>
-              </Grid>
-              
-              <Grid item xs={12}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="subtitle1">
-                    Historique des notifications
-                  </Typography>
-                  
-                  <Button
-                    startIcon={<NotificationIcon />}
-                    onClick={markAllAsRead}
-                    disabled={notifications.every(n => n.read)}
-                  >
-                    Tout marquer comme lu
-                  </Button>
-                </Box>
-                
-                {notificationsLoading ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
-                    <CircularProgress size={32} />
-                  </Box>
-                ) : notifications.length === 0 ? (
-                  <Alert severity="info">
-                    Aucune notification
-                  </Alert>
-                ) : (
-                  <List>
-                    {notifications.map((notification) => (
-                      <ListItem
-                        key={notification._id}
-                        sx={{
-                          backgroundColor: notification.read ? 'transparent' : 'rgba(0, 0, 0, 0.04)',
-                          borderRadius: 1,
-                          mb: 1
-                        }}
-                        secondaryAction={
-                          <IconButton 
-                            edge="end" 
-                            aria-label="delete"
-                            onClick={() => deleteNotification(notification._id)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        }
-                      >
-                        <ListItemIcon>
-                          {getNotificationIcon(notification.type)}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={notification.message}
-                          secondary={
-                            <>
-                              {format(new Date(notification.createdAt), 'PPP à p', { locale: fr })}
-                              {!notification.read && (
-                                <Button
-                                  size="small"
-                                  sx={{ ml: 2 }}
-                                  onClick={() => markNotificationAsRead(notification._id)}
-                                >
-                                  Marquer comme lu
-                                </Button>
-                              )}
-                            </>
-                          }
-                          primaryTypographyProps={{
-                            fontWeight: notification.read ? 'normal' : 'bold'
-                          }}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                )}
-                
-                {/* Pagination simplifiée */}
-                {totalNotifications > ITEMS_PER_PAGE && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                    <Button
-                      disabled={notificationPage === 1}
-                      onClick={() => setNotificationPage(prev => prev - 1)}
-                    >
-                      Précédent
-                    </Button>
-                    <Typography sx={{ mx: 2 }}>
-                      Page {notificationPage} sur {Math.ceil(totalNotifications / ITEMS_PER_PAGE)}
-                    </Typography>
-                    <Button
-                      disabled={notificationPage >= Math.ceil(totalNotifications / ITEMS_PER_PAGE)}
-                      onClick={() => setNotificationPage(prev => prev + 1)}
-                    >
-                      Suivant
-                    </Button>
-                  </Box>
-                )}
-              </Grid>
-            </Grid>
-          </Box>
-        </TabPanel>
-        
         {/* Onglet Apparence */}
-        <TabPanel value={value} index={2}>
+        <TabPanel value={value} index={1}>
           <Box sx={{ p: 2 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -491,17 +249,60 @@ function Settings() {
                       Thème
                     </Typography>
                     
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={userSettings.darkMode}
-                          onChange={handleSettingChange}
-                          name="darkMode"
-                          color="primary"
-                        />
-                      }
-                      label="Mode sombre"
-                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 3 }}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={darkMode}
+                            onChange={toggleTheme}
+                            name="darkMode"
+                            color="primary"
+                          />
+                        }
+                        label={darkMode ? "Mode sombre activé" : "Mode clair activé"}
+                      />
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: 48,
+                            height: 48,
+                            borderRadius: '50%',
+                            backgroundColor: darkMode ? 'primary.main' : 'transparent',
+                            border: '2px solid',
+                            borderColor: darkMode ? 'primary.main' : 'divider',
+                            mr: 2,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease-in-out',
+                          }}
+                          onClick={darkMode ? undefined : toggleTheme}
+                        >
+                          <DarkModeIcon sx={{ color: darkMode ? 'white' : 'text.secondary' }} />
+                        </Box>
+                        
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: 48,
+                            height: 48,
+                            borderRadius: '50%',
+                            backgroundColor: !darkMode ? 'primary.main' : 'transparent',
+                            border: '2px solid',
+                            borderColor: !darkMode ? 'primary.main' : 'divider',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease-in-out',
+                          }}
+                          onClick={darkMode ? toggleTheme : undefined}
+                        >
+                          <LightModeIcon sx={{ color: !darkMode ? 'white' : 'text.secondary' }} />
+                        </Box>
+                      </Box>
+                    </Box>
                     
                     <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
                       Langue
@@ -533,7 +334,7 @@ function Settings() {
         </TabPanel>
         
         {/* Onglet Sécurité */}
-        <TabPanel value={value} index={3}>
+        <TabPanel value={value} index={2}>
           <Box sx={{ p: 2 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>

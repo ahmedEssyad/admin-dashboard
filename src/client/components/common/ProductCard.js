@@ -50,6 +50,7 @@ const ProductCard = ({ product, index }) => {
   const handleWishlistToggle = (e) => {
     try {
       e.preventDefault(); // Empêcher la navigation
+      e.stopPropagation(); // Empêcher la propagation
       if (isProductInWishlist) {
         removeFromWishlist(product._id);
         toast.success('Produit retiré de la liste de souhaits');
@@ -66,6 +67,7 @@ const ProductCard = ({ product, index }) => {
   const handleAddToCart = (e) => {
     try {
       e.preventDefault(); // Empêcher la navigation
+      e.stopPropagation(); // Empêcher la propagation
       if (product.quantite === 0) {
         toast.error('Produit en rupture de stock');
         return;
@@ -75,6 +77,17 @@ const ProductCard = ({ product, index }) => {
     } catch (error) {
       console.error('Erreur lors de l\'ajout au panier:', error);
       toast.error('Une erreur est survenue');
+    }
+  };
+
+  // Fonction pour gérer la navigation avec validation
+  const handleNavigateToProduct = (e) => {
+    // Vérifier que l'ID est valide avant navigation
+    if (!product._id || typeof product._id !== 'string') {
+      e.preventDefault();
+      console.error('Invalid product ID:', product._id);
+      toast.error('Erreur de navigation');
+      return;
     }
   };
 
@@ -99,6 +112,7 @@ const ProductCard = ({ product, index }) => {
           <CardActionArea 
             component={Link} 
             to={`/products/${product._id}`}
+            onClick={handleNavigateToProduct}
             sx={{ 
               position: 'relative',
               '&::before': {
@@ -254,6 +268,7 @@ const ProductCard = ({ product, index }) => {
               <IconButton 
                 component={Link} 
                 to={`/products/${product._id}`}
+                onClick={handleNavigateToProduct}
                 size="small"
                 sx={{ 
                   color: 'text.secondary',

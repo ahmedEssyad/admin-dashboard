@@ -17,7 +17,6 @@ import ProductCard from '../components/common/ProductCard';
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
@@ -43,7 +42,6 @@ const AllProducts = () => {
         setProducts(productsResponse.data);
         setCategories(categoriesResponse.data);
         setCompanies(companiesResponse.data);
-        setFilteredProducts(productsResponse.data);
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
@@ -54,8 +52,8 @@ const AllProducts = () => {
     fetchData();
   }, []);
 
-  // Filter products based on search and filters
-  useEffect(() => {
+  // Optimized filtering with useMemo
+  const filteredProducts = useMemo(() => {
     let result = products;
 
     // Search filter
@@ -65,18 +63,34 @@ const AllProducts = () => {
       );
     }
 
-    // Category filter
+    // Category filter - Fixed: using categoriesa_id
     if (filters.category) {
-      result = result.filter(product => 
-        product.Category_id?.name === filters.category
-      );
+      result = result.filter(product => {
+        if (product.categoriesa_id && Array.isArray(product.categoriesa_id)) {
+          return product.categoriesa_id.some(category => 
+            category && category.name === filters.category
+          );
+        }
+        return false;
+      });
     }
 
-    // Company filter
+    // Company filter - Fixed: handling both populated and non-populated Company_id
     if (filters.company) {
-      result = result.filter(product => 
-        product.Company_id?.nom === filters.company
-      );
+      result = result.filter(product => {
+        // Case 1: Company_id is a populated object
+        if (product.Company_id && typeof product.Company_id === 'object' && product.Company_id.nom) {
+          return product.Company_id.nom === filters.company;
+        }
+        
+        // Case 2: Company_id is just an ObjectId string
+        if (product.Company_id && typeof product.Company_id === 'string') {
+          const company = companies.find(c => c._id === product.Company_id);
+          return company && company.nom === filters.company;
+        }
+        
+        return false;
+      });
     }
 
     // Price range filter
@@ -90,8 +104,8 @@ const AllProducts = () => {
       result = result.filter(product => product.discountedPrice);
     }
 
-    setFilteredProducts(result);
-  }, [searchTerm, filters, products]);
+    return result;
+  }, [searchTerm, filters, products, companies]);
 
   // Clear all filters
   const clearFilters = () => {
@@ -181,7 +195,7 @@ const AllProducts = () => {
           color="text.secondary" 
           sx={{ mb: 3 }}
         >
-          Découvrez notre large sélection de produits
+          Découvrez notre large sélection de produits ({filteredProducts.length} produits)
         </Typography>
       </Box>
 

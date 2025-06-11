@@ -13,6 +13,7 @@ import {
   ShoppingCart as CartIcon,
   Search as SearchIcon
 } from '@mui/icons-material';
+import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   return (
@@ -31,7 +32,8 @@ const Header = () => {
           Mon E-commerce
         </Typography>
         
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <ThemeToggle />
           <IconButton color="inherit" component={RouterLink} to="/search">
             <SearchIcon />
           </IconButton>
@@ -49,4 +51,4 @@ const Header = () => {
   );
 };
 
-export default Header; 
+export default Header;

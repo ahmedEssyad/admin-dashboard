@@ -108,10 +108,31 @@ const Checkout = () => {
       const orderData = {
         customer: customerInfo,
         shippingAddress,
-        items: cartItems.map(item => ({
-          product: item._id,
-          quantity: item.quantity
-        }))
+        items: cartItems.map(item => {
+          // Structure de base pour tous les produits
+          const orderItem = {
+            product: item._id,
+            quantity: item.quantity
+          };
+          
+          // Ajouter les informations de variation pour les produits variables
+          if (item.productType === 'variable') {
+            // Si le produit a un variationId, l'ajouter
+            if (item.variationId) {
+              orderItem.variationId = item.variationId;
+            }
+            
+            // Ajouter les attributs de variation si disponibles
+            if (item.selectedColor || item.selectedSize) {
+              orderItem.variation = {
+                color: item.selectedColor || null,
+                size: item.selectedSize || null
+              };
+            }
+          }
+          
+          return orderItem;
+        })
       };
       
       // Envoyer la commande au serveur
@@ -119,7 +140,7 @@ const Checkout = () => {
       
       // Traiter la réponse
       if (response.data.success) {
-        setOrderNumber(response.data.data.orderNumber);
+        setOrderNumber(response.data.data.orderNumber || 'ORDER-' + new Date().getTime());
         setOrderComplete(true);
         clearCart();
       }
@@ -128,7 +149,30 @@ const Checkout = () => {
     } catch (error) {
       setLoading(false);
       console.error('Erreur lors de la création de la commande:', error);
-      setError(error.response?.data?.message || 'Une erreur est survenue lors de la création de votre commande');
+      
+      // Message d'erreur détaillé et adapté
+      let errorMessage = 'Une erreur est survenue lors de la création de votre commande.';
+      
+      // Détection spécifique des différents types d'erreurs
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        errorMessage = 'Le serveur met trop de temps à répondre. Veuillez réessayer plus tard.';
+      } else if (error.response) {
+        // Erreur de réponse du serveur
+        if (error.response.status === 500) {
+          errorMessage = 'Erreur interne du serveur. Notre équipe a été notifiée du problème.';
+        } else if (error.response.status === 400) {
+          errorMessage = error.response.data?.message || 'Les données de commande sont invalides.';
+        } else if (error.response.status === 401) {
+          errorMessage = 'Vous devez être connecté pour passer une commande.';
+        } else if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error.request) {
+        // Requête envoyée mais pas de réponse
+        errorMessage = 'Impossible de contacter le serveur. Veuillez vérifier votre connexion Internet.';
+      }
+      
+      setError(errorMessage);
     }
   };
   
@@ -315,13 +359,23 @@ const Checkout = () => {
                         </Typography>
                         <br />
                         <Typography component="span" variant="body2" color="text.primary">
-                          Prix unitaire: {getProductPrice(item).toFixed(2)} €
+                          Prix unitaire: {getProductPrice(item).toFixed(2)} MRU
                         </Typography>
+                        {item.productType === 'variable' && (
+                          <>
+                            <br />
+                            <Typography component="span" variant="body2" color="text.primary">
+                              {item.selectedColor && `Couleur: ${item.selectedColor}`}
+                              {item.selectedColor && item.selectedSize && ' / '}
+                              {item.selectedSize && `Taille: ${item.selectedSize}`}
+                            </Typography>
+                          </>
+                        )}
                       </>
                     }
                   />
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                    {(getProductPrice(item) * item.quantity).toFixed(2)} €
+                    {(getProductPrice(item) * item.quantity).toFixed(2)} MRU
                   </Typography>
                 </ListItem>
               ))}
@@ -332,7 +386,7 @@ const Checkout = () => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
               <Typography variant="h6">Total</Typography>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {getCartTotal().toFixed(2)} €
+                {getCartTotal().toFixed(2)} MRU
               </Typography>
             </Box>
             

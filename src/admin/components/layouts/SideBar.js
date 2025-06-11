@@ -170,6 +170,8 @@ const Sidebar = ({ mobileOpen, handleDrawerToggle, drawerWidth }) => {
   // Filtrer les éléments du menu en fonction des permissions
   const visibleMenuItems = menuItems.filter(item => item.show);
 
+  const isDarkMode = theme.palette.mode === 'dark';
+
   const drawer = (
     <div>
       <Box sx={{ 
@@ -230,11 +232,13 @@ const Sidebar = ({ mobileOpen, handleDrawerToggle, drawerWidth }) => {
                     sx={{
                       borderRadius: 2,
                       color: openSubmenu === item.id ? theme.palette.primary.main : theme.palette.text.primary,
-                      bgcolor: openSubmenu === item.id ? 'rgba(37, 99, 235, 0.08)' : 'transparent',
+                      bgcolor: openSubmenu === item.id 
+                        ? (isDarkMode ? 'rgba(37, 99, 235, 0.16)' : 'rgba(37, 99, 235, 0.08)') 
+                        : 'transparent',
                     }}
                   >
                     <ListItemIcon sx={{ 
-                      color: openSubmenu === item.id ? theme.palette.primary.main : 'inherit',
+                      color: openSubmenu === item.id ? theme.palette.primary.main : theme.palette.text.secondary,
                       minWidth: 40
                     }}>
                       {item.icon}
@@ -254,14 +258,16 @@ const Sidebar = ({ mobileOpen, handleDrawerToggle, drawerWidth }) => {
                             borderRadius: 2,
                             pl: 2,
                             color: isActive(subItem.path) ? theme.palette.primary.main : theme.palette.text.primary,
-                            bgcolor: isActive(subItem.path) ? 'rgba(37, 99, 235, 0.08)' : 'transparent',
+                            bgcolor: isActive(subItem.path) 
+                              ? (isDarkMode ? 'rgba(37, 99, 235, 0.16)' : 'rgba(37, 99, 235, 0.08)') 
+                              : 'transparent',
                             '&:hover': {
-                              bgcolor: 'rgba(37, 99, 235, 0.12)',
+                              bgcolor: isDarkMode ? 'rgba(37, 99, 235, 0.24)' : 'rgba(37, 99, 235, 0.12)',
                             }
                           }}
                         >
                           <ListItemIcon sx={{ 
-                            color: isActive(subItem.path) ? theme.palette.primary.main : 'inherit',
+                            color: isActive(subItem.path) ? theme.palette.primary.main : theme.palette.text.secondary,
                             minWidth: 36
                           }}>
                             {subItem.icon}
@@ -287,14 +293,16 @@ const Sidebar = ({ mobileOpen, handleDrawerToggle, drawerWidth }) => {
                   sx={{
                     borderRadius: 2,
                     color: isActive(item.path) ? theme.palette.primary.main : theme.palette.text.primary,
-                    bgcolor: isActive(item.path) ? 'rgba(37, 99, 235, 0.08)' : 'transparent',
+                    bgcolor: isActive(item.path) 
+                      ? (isDarkMode ? 'rgba(37, 99, 235, 0.16)' : 'rgba(37, 99, 235, 0.08)') 
+                      : 'transparent',
                     '&:hover': {
-                      bgcolor: 'rgba(37, 99, 235, 0.12)',
+                      bgcolor: isDarkMode ? 'rgba(37, 99, 235, 0.24)' : 'rgba(37, 99, 235, 0.12)',
                     }
                   }}
                 >
                   <ListItemIcon sx={{ 
-                    color: isActive(item.path) ? theme.palette.primary.main : 'inherit',
+                    color: isActive(item.path) ? theme.palette.primary.main : theme.palette.text.secondary,
                     minWidth: 40
                   }}>
                     {item.icon}
@@ -338,7 +346,7 @@ const Sidebar = ({ mobileOpen, handleDrawerToggle, drawerWidth }) => {
           '& .MuiDrawer-paper': { 
             boxSizing: 'border-box', 
             width: drawerWidth,
-            boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+            boxShadow: isDarkMode ? '0 10px 30px rgba(0,0,0,0.3)' : '0 10px 30px rgba(0,0,0,0.1)'
           },
         }}
       >
@@ -352,7 +360,9 @@ const Sidebar = ({ mobileOpen, handleDrawerToggle, drawerWidth }) => {
           '& .MuiDrawer-paper': { 
             boxSizing: 'border-box', 
             width: drawerWidth,
-            borderRight: '1px solid rgba(0, 0, 0, 0.05)'
+            borderRight: isDarkMode 
+              ? '1px solid rgba(255, 255, 255, 0.05)' 
+              : '1px solid rgba(0, 0, 0, 0.05)'
           },
         }}
         open

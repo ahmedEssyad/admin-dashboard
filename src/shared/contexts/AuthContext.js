@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axiosInstance from '../api/axiosConfig';
-import browserHistory from '../utils/browserHistory';
 
 const AuthContext = createContext();
 

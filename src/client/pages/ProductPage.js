@@ -177,6 +177,18 @@ const ProductPage = () => {
     severity: 'success'
   });
   
+  // Validation de l'ID au démarrage
+  useEffect(() => {
+    // Vérifier si l'ID est valide (MongoDB ObjectId format)
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    
+    if (!id || !isValidObjectId) {
+      console.warn('ID de produit invalide:', id);
+      navigate('/404', { replace: true });
+      return;
+    }
+  }, [id, navigate]);
+
   // Vérifier si le produit est dans la liste de souhaits
   useEffect(() => {
     if (product) {
@@ -187,9 +199,18 @@ const ProductPage = () => {
   // Charger les données du produit
   useEffect(() => {
     const fetchProductData = async () => {
+      if (!id) return;
+      
       try {
         setLoading(true);
+        setError(null);
+        
         const response = await axiosInstance.get(`/products/${id}`);
+        
+        if (!response.data || !response.data._id) {
+          throw new Error('Produit non trouvé');
+        }
+        
         setProduct(response.data);
         
         // Initialiser les valeurs par défaut pour les variations
@@ -222,6 +243,13 @@ const ProductPage = () => {
         setLoading(false);
       } catch (err) {
         console.error('Erreur lors du chargement du produit:', err);
+        
+        // Si erreur 404, rediriger vers la page 404
+        if (err.response?.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        
         setError('Une erreur est survenue lors du chargement des informations du produit.');
         setLoading(false);
       }
@@ -230,7 +258,7 @@ const ProductPage = () => {
     if (id) {
       fetchProductData();
     }
-  }, [id]);
+  }, [id, navigate]);
   
   // Filtrer les variations disponibles en fonction des sélections actuelles
   const availableColors = useMemo(() => {
