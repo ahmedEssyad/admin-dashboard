@@ -30,16 +30,19 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Ne pas rediriger automatiquement sur 401
-    // Laisser le contexte d'authentification gérer les erreurs
-    // Seulement nettoyer le localStorage si c'est vraiment une erreur d'auth
+    // Ne pas nettoyer le localStorage pour les erreurs de login
     if (error.response && error.response.status === 401) {
-      // Ne pas rediriger immédiatement, laisser le composant gérer
-      console.log('Token expired or invalid - cleaning localStorage');
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('username');
-      localStorage.removeItem('role');
+      // Vérifier si c'est une tentative de login (ne pas nettoyer le localStorage)
+      const isLoginRequest = error.config?.url?.includes('/auth/login');
+      
+      if (!isLoginRequest) {
+        // Seulement nettoyer si ce n'est pas une tentative de login
+        console.log('Token expired or invalid - cleaning localStorage');
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+      }
     }
     return Promise.reject(error);
   }
