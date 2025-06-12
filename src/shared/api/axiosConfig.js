@@ -30,11 +30,16 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Si erreur 401 (non autorisé), rediriger vers la page de connexion
+    // Ne pas rediriger automatiquement sur 401
+    // Laisser le contexte d'authentification gérer les erreurs
+    // Seulement nettoyer le localStorage si c'est vraiment une erreur d'auth
     if (error.response && error.response.status === 401) {
+      // Ne pas rediriger immédiatement, laisser le composant gérer
+      console.log('Token expired or invalid - cleaning localStorage');
       localStorage.removeItem('token');
-      // Format pour BrowserRouter
-      window.location.href = '/admin/login';
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('username');
+      localStorage.removeItem('role');
     }
     return Promise.reject(error);
   }
